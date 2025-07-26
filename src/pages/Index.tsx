@@ -1,9 +1,8 @@
 import React from 'react'
-import { Link } from 'react-router-dom'
+import { Link, Navigate } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import SetupGuide from '@/components/SetupGuide'
-import { isSupabaseConfigured } from '@/lib/supabase'
+import { useAuth } from '@/contexts/AuthContext'
 import { 
   PiggyBank, 
   TrendingUp, 
@@ -14,9 +13,11 @@ import {
 } from 'lucide-react'
 
 const Index = () => {
-  // Show setup guide if Supabase is not configured
-  if (!isSupabaseConfigured) {
-    return <SetupGuide />
+  const { user } = useAuth()
+
+  // Redirect to dashboard if user is already logged in
+  if (user) {
+    return <Navigate to="/dashboard" replace />
   }
   return (
     <div className="min-h-screen bg-gradient-to-br from-background to-secondary">

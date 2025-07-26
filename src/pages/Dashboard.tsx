@@ -2,6 +2,8 @@ import React from 'react'
 import { useAuth } from '@/contexts/AuthContext'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { useFinancialSummary } from '@/hooks/useSupabaseData'
+import AddSampleData from '@/components/AddSampleData'
 import { 
   TrendingUp, 
   TrendingDown, 
@@ -15,15 +17,11 @@ import {
 
 const Dashboard = () => {
   const { user, signOut } = useAuth()
+  const { totalAssets, totalDebts, netWorth, assets, debts } = useFinancialSummary()
 
   const handleSignOut = async () => {
     await signOut()
   }
-
-  // Mock data for demonstration
-  const totalAssets = 150000
-  const totalDebts = 45000
-  const netWorth = totalAssets - totalDebts
 
   return (
     <div className="min-h-screen bg-background">
@@ -48,6 +46,9 @@ const Dashboard = () => {
       </header>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Show sample data card if no data exists */}
+        {totalAssets === 0 && totalDebts === 0 && <AddSampleData />}
+        
         {/* Summary Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <Card className="bg-gradient-success text-white shadow-finance">
@@ -121,26 +122,28 @@ const Dashboard = () => {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                <div className="flex items-center justify-between p-3 bg-secondary rounded-lg">
-                  <div>
-                    <p className="font-medium">Tesla Stock</p>
-                    <p className="text-sm text-muted-foreground">Stock Investment</p>
+                {assets.length === 0 ? (
+                  <div className="text-center py-8">
+                    <p className="text-muted-foreground">No assets added yet</p>
+                    <Button variant="outline" className="mt-2">
+                      <Plus className="h-4 w-4 mr-2" />
+                      Add Your First Asset
+                    </Button>
                   </div>
-                  <div className="text-right">
-                    <p className="font-medium">$15,420</p>
-                    <p className="text-sm text-success">+2.3%</p>
-                  </div>
-                </div>
-                <div className="flex items-center justify-between p-3 bg-secondary rounded-lg">
-                  <div>
-                    <p className="font-medium">Emergency Fund</p>
-                    <p className="text-sm text-muted-foreground">Savings Account</p>
-                  </div>
-                  <div className="text-right">
-                    <p className="font-medium">$25,000</p>
-                    <p className="text-sm text-muted-foreground">Cash</p>
-                  </div>
-                </div>
+                ) : (
+                  assets.slice(0, 3).map((asset) => (
+                    <div key={asset.id} className="flex items-center justify-between p-3 bg-secondary rounded-lg">
+                      <div>
+                        <p className="font-medium">{asset.name}</p>
+                        <p className="text-sm text-muted-foreground capitalize">{asset.type.replace('_', ' ')}</p>
+                      </div>
+                      <div className="text-right">
+                        <p className="font-medium">${asset.value.toLocaleString()}</p>
+                        <p className="text-sm text-muted-foreground">{asset.currency}</p>
+                      </div>
+                    </div>
+                  ))
+                )}
               </div>
             </CardContent>
           </Card>
@@ -152,26 +155,30 @@ const Dashboard = () => {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                <div className="flex items-center justify-between p-3 bg-secondary rounded-lg">
-                  <div>
-                    <p className="font-medium">Home Mortgage</p>
-                    <p className="text-sm text-muted-foreground">Wells Fargo</p>
+                {debts.length === 0 ? (
+                  <div className="text-center py-8">
+                    <p className="text-muted-foreground">No debts recorded</p>
+                    <Button variant="outline" className="mt-2">
+                      <CreditCard className="h-4 w-4 mr-2" />
+                      Add Debt Information
+                    </Button>
                   </div>
-                  <div className="text-right">
-                    <p className="font-medium">$35,000</p>
-                    <p className="text-sm text-muted-foreground">3.2% APR</p>
-                  </div>
-                </div>
-                <div className="flex items-center justify-between p-3 bg-secondary rounded-lg">
-                  <div>
-                    <p className="font-medium">Credit Card</p>
-                    <p className="text-sm text-muted-foreground">Chase Sapphire</p>
-                  </div>
-                  <div className="text-right">
-                    <p className="font-medium">$2,500</p>
-                    <p className="text-sm text-destructive">18.9% APR</p>
-                  </div>
-                </div>
+                ) : (
+                  debts.slice(0, 3).map((debt) => (
+                    <div key={debt.id} className="flex items-center justify-between p-3 bg-secondary rounded-lg">
+                      <div>
+                        <p className="font-medium">{debt.lender}</p>
+                        <p className="text-sm text-muted-foreground capitalize">{debt.type.replace('_', ' ')}</p>
+                      </div>
+                      <div className="text-right">
+                        <p className="font-medium">${debt.balance.toLocaleString()}</p>
+                        <p className="text-sm text-destructive">
+                          {debt.interest_rate ? `${debt.interest_rate}% APR` : 'No interest'}
+                        </p>
+                      </div>
+                    </div>
+                  ))
+                )}
               </div>
             </CardContent>
           </Card>
