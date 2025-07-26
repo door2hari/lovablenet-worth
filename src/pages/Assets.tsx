@@ -188,22 +188,24 @@ const Assets = () => {
 
         {/* Charts and Table */}
         <Tabs defaultValue="table" className="space-y-4 sm:space-y-6">
-          <TabsList className="grid w-full grid-cols-1 sm:grid-cols-3 bg-card z-10 shadow-sm rounded-t-lg sticky top-0">
-            <TabsTrigger value="table" className="flex items-center gap-2">
-              <BarChart3 className="h-4 w-4" />
-              Table View
-            </TabsTrigger>
-            <TabsTrigger value="charts" className="flex items-center gap-2">
-              <PieChart className="h-4 w-4" />
-              Charts
-            </TabsTrigger>
-            <TabsTrigger value="analytics" className="flex items-center gap-2">
-              <Activity className="h-4 w-4" />
-              Analytics
-            </TabsTrigger>
-          </TabsList>
+          <Card className="p-4">
+            <TabsList className="flex w-full overflow-x-auto no-scrollbar gap-2">
+              <TabsTrigger value="table" className="flex items-center gap-2">
+                <BarChart3 className="h-4 w-4" />
+                Table View
+              </TabsTrigger>
+              <TabsTrigger value="charts" className="flex items-center gap-2">
+                <PieChart className="h-4 w-4" />
+                Charts
+              </TabsTrigger>
+              <TabsTrigger value="analytics" className="flex items-center gap-2">
+                <Activity className="h-4 w-4" />
+                Analytics
+              </TabsTrigger>
+            </TabsList>
+          </Card>
 
-          <TabsContent value="table" className="space-y-6 pt-3">
+          <TabsContent value="table" className="space-y-6">
             <Card className="card-hover">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
@@ -303,7 +305,7 @@ const Assets = () => {
             </Card>
           </TabsContent>
 
-          <TabsContent value="charts" className="space-y-6 pt-3">
+          <TabsContent value="charts" className="space-y-6">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <DonutChartComponent
                 data={assetTypeData}
@@ -323,7 +325,7 @@ const Assets = () => {
             />
           </TabsContent>
 
-          <TabsContent value="analytics" className="space-y-6 pt-3">
+          <TabsContent value="analytics" className="space-y-6">
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               <Card className="card-hover">
                 <CardHeader>

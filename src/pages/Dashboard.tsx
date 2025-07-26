@@ -196,26 +196,28 @@ const Dashboard = () => {
 
         {/* Charts and Analytics */}
         <Tabs defaultValue="overview" className="space-y-4 sm:space-y-6">
-          <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 bg-card z-10 shadow-sm rounded-t-lg sticky top-0">
-            <TabsTrigger value="overview" className="flex items-center gap-2">
-              <BarChart3 className="h-4 w-4" />
-              Overview
-            </TabsTrigger>
-            <TabsTrigger value="assets" className="flex items-center gap-2">
-              <PieChart className="h-4 w-4" />
-              Assets
-            </TabsTrigger>
-            <TabsTrigger value="debts" className="flex items-center gap-2">
-              <LineChart className="h-4 w-4" />
-              Debts
-            </TabsTrigger>
-            <TabsTrigger value="trends" className="flex items-center gap-2">
-              <TrendingUp className="h-4 w-4" />
-              Trends
-            </TabsTrigger>
-          </TabsList>
+          <Card className="p-4">
+            <TabsList className="flex w-full overflow-x-auto no-scrollbar gap-2">
+              <TabsTrigger value="overview" className="flex items-center gap-2">
+                <BarChart3 className="h-4 w-4" />
+                Overview
+              </TabsTrigger>
+              <TabsTrigger value="assets" className="flex items-center gap-2">
+                <PieChart className="h-4 w-4" />
+                Assets
+              </TabsTrigger>
+              <TabsTrigger value="debts" className="flex items-center gap-2">
+                <LineChart className="h-4 w-4" />
+                Debts
+              </TabsTrigger>
+              <TabsTrigger value="trends" className="flex items-center gap-2">
+                <TrendingUp className="h-4 w-4" />
+                Trends
+              </TabsTrigger>
+            </TabsList>
+          </Card>
 
-          <TabsContent value="overview" className="space-y-4 sm:space-y-6 pt-3">
+          <TabsContent value="overview" className="space-y-4 sm:space-y-6">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
               <DonutChartComponent
                 data={assetChartData}
@@ -238,7 +240,7 @@ const Dashboard = () => {
             />
           </TabsContent>
 
-          <TabsContent value="assets" className="space-y-6 pt-3">
+          <TabsContent value="assets" className="space-y-6">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <PieChartComponent
                 data={assetChartData}
@@ -253,7 +255,7 @@ const Dashboard = () => {
             </div>
           </TabsContent>
 
-          <TabsContent value="debts" className="space-y-6 pt-3">
+          <TabsContent value="debts" className="space-y-6">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-2 sm:mt-0">
               <PieChartComponent
                 data={debtChartData}
@@ -268,7 +270,7 @@ const Dashboard = () => {
             </div>
           </TabsContent>
 
-          <TabsContent value="trends" className="space-y-6 pt-3">
+          <TabsContent value="trends" className="space-y-6">
             <div className="grid grid-cols-1 gap-6">
               <LineChartComponent
                 data={monthlyData.map(item => ({ name: item.name, value: item.netWorth }))}

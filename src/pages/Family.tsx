@@ -405,14 +405,16 @@ const Family = () => {
           </CardHeader>
           <CardContent>
             <Tabs defaultValue="overview" className="w-full">
-              <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 bg-card z-10 shadow-sm rounded-t-lg sticky top-0">
-                <TabsTrigger value="overview">Overview</TabsTrigger>
-                <TabsTrigger value="assets">Assets</TabsTrigger>
-                <TabsTrigger value="debts">Debts</TabsTrigger>
-                <TabsTrigger value="members">Members</TabsTrigger>
-              </TabsList>
+              <Card className="p-4">
+                <TabsList className="flex w-full overflow-x-auto no-scrollbar gap-2">
+                  <TabsTrigger value="overview">Overview</TabsTrigger>
+                  <TabsTrigger value="assets">Assets</TabsTrigger>
+                  <TabsTrigger value="debts">Debts</TabsTrigger>
+                  <TabsTrigger value="members">Members</TabsTrigger>
+                </TabsList>
+              </Card>
 
-              <TabsContent value="overview" className="space-y-4 sm:space-y-6 pt-3">
+              <TabsContent value="overview" className="space-y-4 sm:space-y-6">
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
                   <Card>
                     <CardHeader>
@@ -460,7 +462,7 @@ const Family = () => {
                 </div>
               </TabsContent>
 
-              <TabsContent value="assets" className="space-y-6 pt-3">
+              <TabsContent value="assets" className="space-y-6">
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                   <Card>
                                          <CardHeader>
@@ -520,7 +522,7 @@ const Family = () => {
                 </div>
               </TabsContent>
 
-              <TabsContent value="debts" className="space-y-6 pt-3">
+              <TabsContent value="debts" className="space-y-6">
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                   <Card>
                     <CardHeader>
@@ -580,7 +582,7 @@ const Family = () => {
                 </div>
               </TabsContent>
 
-              <TabsContent value="members" className="space-y-6 pt-3">
+              <TabsContent value="members" className="space-y-6">
                 <Card>
                   <CardHeader>
                     <CardTitle>Family Member Financial Summary</CardTitle>
