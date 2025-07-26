@@ -1,64 +1,6 @@
-# Personal Finance Tracker PWA
+-- Personal Finance Tracker Database Schema
+-- Run this in your Supabase SQL Editor
 
-A comprehensive personal finance Progressive Web App (PWA) built with React, Vite, TypeScript, Tailwind CSS, and Supabase. Track your assets, debts, and family finances with a beautiful, secure, and offline-capable interface.
-
-## 🌟 Features
-
-- **📊 Comprehensive Asset Tracking**: Stocks, FDs, RDs, Real Estate, Crypto, and more
-- **💳 Debt Management**: Track loans, credit cards, and payment schedules
-- **👨‍👩‍👧‍👦 Family Finance**: Manage finances for family members
-- **🔐 Secure Authentication**: Email/password and OAuth with Supabase
-- **📱 PWA Ready**: Install on any device, works offline
-- **🎨 Beautiful UI**: Modern design with dark/light mode support
-- **📈 Real-time Calculations**: Live net worth and portfolio updates
-
-## 🚀 Quick Start
-
-### Prerequisites
-
-- Node.js (v18 or higher)
-- A Supabase account
-- Git
-
-### Installation
-
-1. **Clone the repository**
-   ```bash
-   git clone <your-repo-url>
-   cd personal-finance-tracker
-   ```
-
-2. **Install dependencies**
-   ```bash
-   npm install
-   ```
-
-3. **Set up Supabase**
-   - Create a new project at [supabase.com](https://supabase.com)
-   - Copy your project URL and anon key
-   - Create a `.env` file in the root directory:
-   ```env
-   VITE_SUPABASE_URL=your_supabase_project_url
-   VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
-   ```
-
-4. **Set up the database**
-   - In your Supabase dashboard, go to the SQL Editor
-   - Run the SQL migration script (see Database Setup section below)
-
-5. **Start the development server**
-   ```bash
-   npm run dev
-   ```
-
-6. **Visit your app**
-   Open [http://localhost:8080](http://localhost:8080) in your browser
-
-## 🗄️ Database Setup
-
-Run this SQL in your Supabase SQL Editor to set up the required tables:
-
-```sql
 -- Enable Row Level Security
 ALTER TABLE auth.users ENABLE ROW LEVEL SECURITY;
 
@@ -212,127 +154,21 @@ CREATE TRIGGER update_family_assets_updated_at BEFORE UPDATE ON public.family_as
 
 CREATE TRIGGER update_family_debts_updated_at BEFORE UPDATE ON public.family_debts
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
-```
 
-## 🔐 Authentication Setup
+-- Sample data insertion function (optional - for testing)
+CREATE OR REPLACE FUNCTION create_sample_data(user_uuid UUID)
+RETURNS void AS $$
+BEGIN
+    -- Insert sample assets
+    INSERT INTO public.assets (user_id, type, name, value, currency) VALUES
+    (user_uuid, 'stock', 'Tesla Inc. (TSLA)', 15420.00, 'USD'),
+    (user_uuid, 'fd', 'HDFC Fixed Deposit', 50000.00, 'USD'),
+    (user_uuid, 'cash', 'Emergency Fund', 25000.00, 'USD'),
+    (user_uuid, 'property', 'Primary Residence', 450000.00, 'USD');
 
-1. **Enable Authentication in Supabase**
-   - Go to Authentication > Settings in your Supabase dashboard
-   - Enable email authentication
-   - Optionally enable OAuth providers (Google, GitHub, etc.)
-
-2. **Configure OAuth (Optional)**
-   - Add your site URL to the allowed redirect URLs
-   - For local development: `http://localhost:8080`
-   - For production: `https://yourusername.github.io/your-repo-name`
-
-## 🚀 Deployment to GitHub Pages
-
-1. **Configure package.json**
-   Update the homepage field in `package.json`:
-   ```json
-   {
-     "homepage": "https://yourusername.github.io/your-repo-name"
-   }
-   ```
-
-2. **Build and Deploy**
-   ```bash
-   npm run build
-   npm run deploy
-   ```
-
-3. **Update Supabase URLs**
-   - In your Supabase dashboard, go to Authentication > Settings
-   - Add your GitHub Pages URL to the site URL and redirect URLs
-
-## 🛠️ Available Scripts
-
-- `npm run dev` - Start development server
-- `npm run build` - Build for production
-- `npm run preview` - Preview production build
-- `npm run deploy` - Deploy to GitHub Pages
-
-## 📱 PWA Features
-
-This app is a Progressive Web App with:
-
-- **Offline Support**: Works without internet connection
-- **Install Prompt**: Can be installed on desktop and mobile
-- **App-like Experience**: Full-screen, native feel
-- **Background Sync**: Data syncs when connection is restored
-
-To install the app:
-1. Visit the deployed site in Chrome/Safari
-2. Look for the "Install" button in the address bar
-3. Click to install to your home screen
-
-## 🏗️ Architecture
-
-- **Frontend**: React + TypeScript + Vite
-- **Styling**: Tailwind CSS with custom design system
-- **UI Components**: shadcn/ui with custom variants
-- **State Management**: Zustand for auth state
-- **Database**: Supabase PostgreSQL
-- **Authentication**: Supabase Auth
-- **PWA**: Vite PWA plugin
-
-## 📋 Data Models
-
-### Assets
-Track various types of investments and holdings:
-- Stocks (domestic & foreign)
-- Fixed Deposits (FD) & Recurring Deposits (RD)
-- Mutual Funds
-- Real Estate/Property
-- Cryptocurrency
-- Gold & Precious Metals
-- Cash & Savings
-- RSUs & Direct Investments
-
-### Debts
-Monitor loans and liabilities:
-- Personal Loans
-- Home Mortgages
-- Credit Cards
-- Other Debts
-
-### Family Management
-- Add family members
-- Track their assets and debts separately
-- Consolidated family net worth view
-
-## 🔧 Customization
-
-### Adding New Asset Types
-1. Update the `asset_type` enum in your database
-2. Add the new type to `src/types/index.ts`
-3. Update the type definitions in `src/types/database.ts`
-
-### Theming
-Customize colors and design in:
-- `src/index.css` - CSS variables for colors and gradients
-- `tailwind.config.ts` - Tailwind theme extensions
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Add tests if applicable
-5. Submit a pull request
-
-## 📄 License
-
-This project is licensed under the MIT License.
-
-## 🙋‍♂️ Support
-
-If you have questions or need help:
-1. Check the existing issues
-2. Create a new issue with detailed information
-3. Provide steps to reproduce any bugs
-
----
-
-Built with ❤️ using React, Supabase, and modern web technologies.
+    -- Insert sample debts
+    INSERT INTO public.debts (user_id, type, lender, principal, balance, interest_rate, currency) VALUES
+    (user_uuid, 'home_loan', 'Wells Fargo', 400000.00, 350000.00, 3.2, 'USD'),
+    (user_uuid, 'credit_card', 'Chase Sapphire', 5000.00, 2500.00, 18.9, 'USD');
+END;
+$$ language 'plpgsql';
