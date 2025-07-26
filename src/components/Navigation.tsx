@@ -1,5 +1,5 @@
 import React from 'react'
-import { Link, useLocation } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import { useAuth } from '@/contexts/AuthContext'
 import { useIsMobile } from '@/hooks/use-mobile'
@@ -18,6 +18,7 @@ import { useState } from 'react'
 const Navigation = () => {
   const { user, signOut } = useAuth()
   const location = useLocation()
+  const navigate = useNavigate()
   const { isMobile } = useIsMobile()
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
 
@@ -30,7 +31,13 @@ const Navigation = () => {
 
   const handleSignOut = async () => {
     try {
-      await signOut()
+      const { error } = await signOut()
+      if (error) {
+        console.error('Error signing out:', error)
+      } else {
+        // Redirect to login page after successful logout
+        navigate('/login')
+      }
     } catch (error) {
       console.error('Error signing out:', error)
     }

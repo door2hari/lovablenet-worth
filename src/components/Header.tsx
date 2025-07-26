@@ -1,4 +1,5 @@
 import React from 'react'
+import { useNavigate } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import { useAuth } from '@/contexts/AuthContext'
 import { DollarSign, LogOut, User } from 'lucide-react'
@@ -20,10 +21,17 @@ const Header: React.FC<HeaderProps> = ({
   onAddMember
 }) => {
   const { user, signOut } = useAuth()
+  const navigate = useNavigate()
 
   const handleSignOut = async () => {
     try {
-      await signOut()
+      const { error } = await signOut()
+      if (error) {
+        console.error('Error signing out:', error)
+      } else {
+        // Redirect to login page after successful logout
+        navigate('/login')
+      }
     } catch (error) {
       console.error('Error signing out:', error)
     }
