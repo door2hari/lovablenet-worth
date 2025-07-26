@@ -1,189 +1,397 @@
-import React from 'react'
-import { useAuth } from '@/contexts/AuthContext'
-import { Button } from '@/components/ui/button'
+import React, { useState } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { useFinancialSummary } from '@/hooks/useSupabaseData'
-import AddSampleData from '@/components/AddSampleData'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import Header from '@/components/Header'
+
+import { 
+  PieChartComponent, 
+  BarChartComponent, 
+  LineChartComponent, 
+  DonutChartComponent,
+  StackedBarChartComponent,
+  AreaChartComponent
+} from '@/components/ui/charts'
+import { useAssets, useDebts, useFamilyMembers, useFinancialSummary } from '@/hooks/useSupabaseData'
+import { AssetForm } from '@/components/AssetForm'
+import { DebtForm } from '@/components/DebtForm'
+
 import { 
   TrendingUp, 
   TrendingDown, 
   DollarSign, 
+  Users, 
   Plus, 
-  PiggyBank,
-  CreditCard,
-  Users,
-  Settings
+  BarChart3, 
+  PieChart, 
+  LineChart,
+  Download,
+  Target,
+  AlertTriangle,
+  CheckCircle,
+  ArrowUpRight,
+  ArrowDownRight,
+  Activity
 } from 'lucide-react'
+import { useToast } from '@/hooks/use-toast'
+import { format } from 'date-fns'
 
 const Dashboard = () => {
-  const { user, signOut } = useAuth()
-  const { totalAssets, totalDebts, netWorth, assets, debts } = useFinancialSummary()
+  const [isAssetFormOpen, setIsAssetFormOpen] = useState(false)
+  const [isDebtFormOpen, setIsDebtFormOpen] = useState(false)
 
-  const handleSignOut = async () => {
-    await signOut()
+
+  const { data: assets = [], isLoading: assetsLoading } = useAssets()
+  const { data: debts = [], isLoading: debtsLoading } = useDebts()
+  const familyMembersResult = useFamilyMembers()
+  const familyMembers = familyMembersResult.data || []
+  const financialSummary = useFinancialSummary()
+  const { toast } = useToast()
+
+  const { totalAssets, totalDebts, netWorth, assetBreakdown, debtBreakdown } = financialSummary || {}
+
+  const getAssetTypeColor = (type: string) => {
+    const colors: Record<string, string> = {
+      cash: '#10B981',
+      stock: '#3B82F6',
+      mutual_fund: '#8B5CF6',
+      property: '#F59E0B',
+      home: '#EF4444',
+      fd: '#06B6D4',
+      rd: '#84CC16',
+      foreign_stock: '#EC4899',
+      rsu: '#F97316',
+      direct_investment: '#6366F1',
+      gold: '#FCD34D',
+      crypto: '#7C3AED',
+      other: '#6B7280'
+    }
+    return colors[type] || '#6B7280'
   }
 
-  return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="bg-card border-b shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center">
-              <div className="inline-flex items-center justify-center w-10 h-10 bg-gradient-primary rounded-xl mr-3">
-                <PiggyBank className="h-6 w-6 text-white" />
-              </div>
-              <h1 className="text-xl font-bold text-foreground">Finance Tracker</h1>
-            </div>
-            <div className="flex items-center space-x-4">
-              <span className="text-sm text-muted-foreground">Welcome, {user?.email}</span>
-              <Button variant="outline" size="sm" onClick={handleSignOut}>
-                Sign Out
-              </Button>
-            </div>
-          </div>
-        </div>
-      </header>
+  const getDebtTypeColor = (type: string) => {
+    const colors: Record<string, string> = {
+      personal: '#EF4444',
+      home_loan: '#F59E0B',
+      credit_card: '#EC4899',
+      other: '#6B7280'
+    }
+    return colors[type] || '#6B7280'
+  }
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Show sample data card if no data exists */}
-        {totalAssets === 0 && totalDebts === 0 && <AddSampleData />}
-        
+  const generateMonthlyData = (assets: any[], debts: any[]) => {
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+    return months.map((month, index) => {
+      const monthAssets = assets.filter(asset => 
+        new Date(asset.created_at).getMonth() === index
+      )
+      const monthDebts = debts.filter(debt => 
+        new Date(debt.created_at).getMonth() === index
+      )
+      
+      return {
+        name: month,
+        assets: monthAssets.reduce((sum, asset) => sum + asset.value, 0),
+        debts: monthDebts.reduce((sum, debt) => sum + debt.balance, 0),
+        netWorth: monthAssets.reduce((sum, asset) => sum + asset.value, 0) - 
+                 monthDebts.reduce((sum, debt) => sum + debt.balance, 0)
+      }
+    })
+  }
+
+  // Use all assets and debts without filtering
+  const filteredAssets = assets
+  const filteredDebts = debts
+
+  // Prepare chart data
+  const assetChartData = Object.entries(assetBreakdown || {}).map(([type, value]) => ({
+    name: type.charAt(0).toUpperCase() + type.slice(1).replace('_', ' '),
+    value: value as number,
+    color: getAssetTypeColor(type)
+  }))
+
+  const debtChartData = Object.entries(debtBreakdown || {}).map(([type, value]) => ({
+    name: type.charAt(0).toUpperCase() + type.slice(1).replace('_', ' '),
+    value: value as number,
+    color: getDebtTypeColor(type)
+  }))
+
+  const monthlyData = generateMonthlyData(assets, debts)
+
+
+
+  const getNetWorthStatus = () => {
+    if (!netWorth) return { status: 'neutral', text: 'No data', icon: Activity }
+    if (netWorth > 0) return { status: 'positive', text: 'Positive', icon: CheckCircle }
+    return { status: 'negative', text: 'Negative', icon: AlertTriangle }
+  }
+
+  const netWorthStatus = getNetWorthStatus()
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+      <Header 
+        title="Financial Dashboard"
+        showAddButtons={true}
+        onAddAsset={() => setIsAssetFormOpen(true)}
+        onAddDebt={() => setIsDebtFormOpen(true)}
+      />
+
+      <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8 py-4 sm:py-8 space-y-4 sm:space-y-8">
+
+
         {/* Summary Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <Card className="bg-gradient-success text-white shadow-finance">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
+          <Card className="card-hover bg-gradient-to-br from-green-500 to-green-600 text-white shadow-finance">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium text-white/90">Total Assets</CardTitle>
               <TrendingUp className="h-4 w-4 text-white/90" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">${totalAssets.toLocaleString()}</div>
-              <p className="text-xs text-white/70">+12% from last month</p>
+              <div className="text-lg sm:text-2xl font-bold">₹{totalAssets?.toLocaleString() || '0'}</div>
+              <p className="text-xs text-white/70">{assets.length} assets</p>
             </CardContent>
           </Card>
 
-          <Card className="bg-gradient-to-r from-red-500 to-red-600 text-white shadow-finance">
+          <Card className="card-hover bg-gradient-to-br from-red-500 to-red-600 text-white shadow-finance">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium text-white/90">Total Debts</CardTitle>
               <TrendingDown className="h-4 w-4 text-white/90" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">${totalDebts.toLocaleString()}</div>
-              <p className="text-xs text-white/70">-5% from last month</p>
+              <div className="text-lg sm:text-2xl font-bold">₹{totalDebts?.toLocaleString() || '0'}</div>
+              <p className="text-xs text-white/70">{debts.length} debts</p>
             </CardContent>
           </Card>
 
-          <Card className="bg-gradient-primary text-white shadow-finance">
+          <Card className={`card-hover shadow-finance ${
+            netWorthStatus.status === 'positive' 
+              ? 'bg-gradient-to-br from-blue-500 to-blue-600 text-white' 
+              : netWorthStatus.status === 'negative'
+              ? 'bg-gradient-to-br from-orange-500 to-orange-600 text-white'
+              : 'bg-gradient-to-br from-gray-500 to-gray-600 text-white'
+          }`}>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium text-white/90">Net Worth</CardTitle>
-              <DollarSign className="h-4 w-4 text-white/90" />
+              <netWorthStatus.icon className="h-4 w-4 text-white/90" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">${netWorth.toLocaleString()}</div>
-              <p className="text-xs text-white/70">+18% from last month</p>
+              <div className="text-lg sm:text-2xl font-bold">₹{netWorth?.toLocaleString() || '0'}</div>
+              <p className="text-xs text-white/70">{netWorthStatus.text}</p>
+            </CardContent>
+          </Card>
+
+          <Card className="card-hover bg-gradient-to-br from-purple-500 to-purple-600 text-white shadow-finance">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium text-white/90">Family Members</CardTitle>
+              <Users className="h-4 w-4 text-white/90" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-lg sm:text-2xl font-bold">{familyMembers.length}</div>
+              <p className="text-xs text-white/70">family members</p>
             </CardContent>
           </Card>
         </div>
 
+        {/* Charts and Analytics */}
+        <Tabs defaultValue="overview" className="space-y-4 sm:space-y-6">
+          <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 bg-card z-10 shadow-sm rounded-t-lg sticky top-0">
+            <TabsTrigger value="overview" className="flex items-center gap-2">
+              <BarChart3 className="h-4 w-4" />
+              Overview
+            </TabsTrigger>
+            <TabsTrigger value="assets" className="flex items-center gap-2">
+              <PieChart className="h-4 w-4" />
+              Assets
+            </TabsTrigger>
+            <TabsTrigger value="debts" className="flex items-center gap-2">
+              <LineChart className="h-4 w-4" />
+              Debts
+            </TabsTrigger>
+            <TabsTrigger value="trends" className="flex items-center gap-2">
+              <TrendingUp className="h-4 w-4" />
+              Trends
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="overview" className="space-y-4 sm:space-y-6 pt-3">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+              <DonutChartComponent
+                data={assetChartData}
+                title="Asset Distribution"
+                height={300}
+                className="min-h-[300px]"
+              />
+              <DonutChartComponent
+                data={debtChartData}
+                title="Debt Distribution"
+                height={300}
+                className="min-h-[300px]"
+              />
+            </div>
+            <StackedBarChartComponent
+              data={monthlyData}
+              keys={['assets', 'debts', 'netWorth']}
+              title="Monthly Financial Overview"
+              height={400}
+            />
+          </TabsContent>
+
+          <TabsContent value="assets" className="space-y-6 pt-3">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <PieChartComponent
+                data={assetChartData}
+                title="Asset Types Breakdown"
+                height={400}
+              />
+              <BarChartComponent
+                data={assetChartData}
+                title="Asset Values by Type"
+                height={400}
+              />
+            </div>
+          </TabsContent>
+
+          <TabsContent value="debts" className="space-y-6 pt-3">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-2 sm:mt-0">
+              <PieChartComponent
+                data={debtChartData}
+                title="Debt Types Breakdown"
+                height={400}
+              />
+              <BarChartComponent
+                data={debtChartData}
+                title="Debt Balances by Type"
+                height={400}
+              />
+            </div>
+          </TabsContent>
+
+          <TabsContent value="trends" className="space-y-6 pt-3">
+            <div className="grid grid-cols-1 gap-6">
+              <LineChartComponent
+                data={monthlyData.map(item => ({ name: item.name, value: item.netWorth }))}
+                title="Net Worth Trend"
+                height={400}
+              />
+              <AreaChartComponent
+                data={monthlyData.map(item => ({ name: item.name, value: item.assets }))}
+                title="Assets Growth Trend"
+                height={400}
+              />
+            </div>
+          </TabsContent>
+        </Tabs>
+
         {/* Quick Actions */}
-        <Card className="mb-8 shadow-card">
+        <Card className="card-hover">
           <CardHeader>
-            <CardTitle>Quick Actions</CardTitle>
-            <CardDescription>Manage your financial portfolio</CardDescription>
+            <CardTitle className="flex items-center gap-2">
+              <Target className="h-5 w-5" />
+              Quick Actions
+            </CardTitle>
+            <CardDescription>Manage your financial portfolio efficiently</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <Button className="h-20 flex-col space-y-2">
+            <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+              <Button 
+                variant="outline" 
+                className="h-20 flex-col gap-2 button-glow"
+                onClick={() => setIsAssetFormOpen(true)}
+              >
                 <Plus className="h-6 w-6" />
-                <span>Add Asset</span>
+                <span className="text-sm">Add Asset</span>
               </Button>
-              <Button variant="outline" className="h-20 flex-col space-y-2">
-                <CreditCard className="h-6 w-6" />
-                <span>Add Debt</span>
+              <Button 
+                variant="outline" 
+                className="h-20 flex-col gap-2 button-glow"
+                onClick={() => setIsDebtFormOpen(true)}
+              >
+                <Plus className="h-6 w-6" />
+                <span className="text-sm">Add Debt</span>
               </Button>
-              <Button variant="outline" className="h-20 flex-col space-y-2">
+              <Button 
+                variant="outline" 
+                className="h-20 flex-col gap-2 button-glow"
+                onClick={() => window.location.href = '/assets'}
+              >
+                <BarChart3 className="h-6 w-6" />
+                <span className="text-sm">View Assets</span>
+              </Button>
+              <Button 
+                variant="outline" 
+                className="h-20 flex-col gap-2 button-glow"
+                onClick={() => window.location.href = '/debts'}
+              >
+                <TrendingDown className="h-6 w-6" />
+                <span className="text-sm">View Debts</span>
+              </Button>
+              <Button 
+                variant="outline" 
+                className="h-20 flex-col gap-2 button-glow"
+                onClick={() => window.location.href = '/family'}
+              >
                 <Users className="h-6 w-6" />
-                <span>Family</span>
-              </Button>
-              <Button variant="outline" className="h-20 flex-col space-y-2">
-                <Settings className="h-6 w-6" />
-                <span>Settings</span>
+                <span className="text-sm">Family</span>
               </Button>
             </div>
           </CardContent>
         </Card>
 
         {/* Recent Activity */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <Card className="shadow-card">
-            <CardHeader>
-              <CardTitle>Recent Assets</CardTitle>
-              <CardDescription>Your latest asset additions</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {assets.length === 0 ? (
-                  <div className="text-center py-8">
-                    <p className="text-muted-foreground">No assets added yet</p>
-                    <Button variant="outline" className="mt-2">
-                      <Plus className="h-4 w-4 mr-2" />
-                      Add Your First Asset
-                    </Button>
-                  </div>
-                ) : (
-                  assets.slice(0, 3).map((asset) => (
-                    <div key={asset.id} className="flex items-center justify-between p-3 bg-secondary rounded-lg">
+        <Card className="card-hover">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Activity className="h-5 w-5" />
+              Recent Activity
+            </CardTitle>
+            <CardDescription>Latest additions to your portfolio</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {[...assets, ...debts]
+                .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+                .slice(0, 5)
+                .map((item, index) => (
+                  <div key={index} className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
+                    <div className="flex items-center gap-3">
+                      <div className={`w-2 h-2 rounded-full ${
+                        'value' in item ? 'bg-green-500' : 'bg-red-500'
+                      }`} />
                       <div>
-                        <p className="font-medium">{asset.name}</p>
-                        <p className="text-sm text-muted-foreground capitalize">{asset.type.replace('_', ' ')}</p>
-                      </div>
-                      <div className="text-right">
-                        <p className="font-medium">${asset.value.toLocaleString()}</p>
-                        <p className="text-sm text-muted-foreground">{asset.currency}</p>
-                      </div>
-                    </div>
-                  ))
-                )}
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="shadow-card">
-            <CardHeader>
-              <CardTitle>Recent Debts</CardTitle>
-              <CardDescription>Your current debt obligations</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {debts.length === 0 ? (
-                  <div className="text-center py-8">
-                    <p className="text-muted-foreground">No debts recorded</p>
-                    <Button variant="outline" className="mt-2">
-                      <CreditCard className="h-4 w-4 mr-2" />
-                      Add Debt Information
-                    </Button>
-                  </div>
-                ) : (
-                  debts.slice(0, 3).map((debt) => (
-                    <div key={debt.id} className="flex items-center justify-between p-3 bg-secondary rounded-lg">
-                      <div>
-                        <p className="font-medium">{debt.lender}</p>
-                        <p className="text-sm text-muted-foreground capitalize">{debt.type.replace('_', ' ')}</p>
-                      </div>
-                      <div className="text-right">
-                        <p className="font-medium">${debt.balance.toLocaleString()}</p>
-                        <p className="text-sm text-destructive">
-                          {debt.interest_rate ? `${debt.interest_rate}% APR` : 'No interest'}
+                        <p className="font-medium">
+                          {'value' in item ? item.name : item.lender}
+                        </p>
+                        <p className="text-sm text-muted-foreground">
+                          {'value' in item ? 'Asset' : 'Debt'} • {format(new Date(item.created_at), 'MMM dd, yyyy')}
                         </p>
                       </div>
                     </div>
-                  ))
-                )}
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+                    <div className="text-right">
+                      <p className="font-medium">
+                        ₹{('value' in item ? item.value : item.balance).toLocaleString()}
+                      </p>
+                      <p className="text-sm text-muted-foreground">
+                        {('value' in item ? item.type : item.type).replace('_', ' ')}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+            </div>
+          </CardContent>
+        </Card>
       </div>
+
+      {/* Forms */}
+      <AssetForm
+        open={isAssetFormOpen}
+        onOpenChange={setIsAssetFormOpen}
+      />
+      <DebtForm
+        open={isDebtFormOpen}
+        onOpenChange={setIsDebtFormOpen}
+      />
     </div>
   )
 }

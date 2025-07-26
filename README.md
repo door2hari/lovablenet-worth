@@ -11,6 +11,7 @@ A comprehensive personal finance Progressive Web App (PWA) built with React, Vit
 - **📱 PWA Ready**: Install on any device, works offline
 - **🎨 Beautiful UI**: Modern design with dark/light mode support
 - **📈 Real-time Calculations**: Live net worth and portfolio updates
+- **📱 Mobile Optimized**: Responsive design with touch-friendly interface
 
 ## 🚀 Quick Start
 
@@ -25,7 +26,7 @@ A comprehensive personal finance Progressive Web App (PWA) built with React, Vit
 1. **Clone the repository**
    ```bash
    git clone <your-repo-url>
-   cd personal-finance-tracker
+   cd lovablenet-worth
    ```
 
 2. **Install dependencies**
@@ -36,11 +37,7 @@ A comprehensive personal finance Progressive Web App (PWA) built with React, Vit
 3. **Set up Supabase**
    - Create a new project at [supabase.com](https://supabase.com)
    - Copy your project URL and anon key
-   - Create a `.env` file in the root directory:
-   ```env
-   VITE_SUPABASE_URL=your_supabase_project_url
-   VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
-   ```
+   - Update `src/integrations/supabase/client.ts` with your credentials
 
 4. **Set up the database**
    - In your Supabase dashboard, go to the SQL Editor
@@ -53,6 +50,107 @@ A comprehensive personal finance Progressive Web App (PWA) built with React, Vit
 
 6. **Visit your app**
    Open [http://localhost:8080](http://localhost:8080) in your browser
+
+## 🌐 GitHub Pages Deployment
+
+### Step 1: Update Repository Settings
+
+1. **Update package.json homepage**
+   ```bash
+   # Replace 'yourusername' with your actual GitHub username
+   # The repository name should match your actual repository name
+   ```
+
+2. **Enable GitHub Pages**
+   - Go to your repository on GitHub
+   - Navigate to Settings > Pages
+   - Set Source to "Deploy from a branch"
+   - Select "gh-pages" branch
+   - Click Save
+
+### Step 2: Configure Supabase for Production
+
+1. **Update Supabase Redirect URLs**
+   - Go to your Supabase dashboard
+   - Navigate to Authentication > Settings
+   - Add your GitHub Pages URL to Site URL:
+     ```
+     https://yourusername.github.io/lovablenet-worth
+     ```
+   - Add to Redirect URLs:
+     ```
+     https://yourusername.github.io/lovablenet-worth/**
+     ```
+
+### Step 3: Deploy
+
+1. **Build and deploy**
+   ```bash
+   npm run deploy
+   ```
+
+2. **Verify deployment**
+   - Wait 2-3 minutes for GitHub Pages to build
+   - Visit your deployed site
+   - Test authentication and functionality
+
+### Step 4: Custom Domain (Optional)
+
+If you want to use a custom domain:
+
+1. **Add custom domain in GitHub Pages settings**
+2. **Update package.json homepage**
+3. **Update Supabase redirect URLs**
+4. **Redeploy**
+
+## 📱 Mobile Usage
+
+### Local Development on Mobile
+
+1. **Find your local IP address**
+   ```bash
+   # On Windows
+   ipconfig
+   
+   # On Mac/Linux
+   ifconfig
+   ```
+
+2. **Start development server with host binding**
+   ```bash
+   npm run dev
+   ```
+
+3. **Access on mobile**
+   - Ensure your mobile device is on the same WiFi network
+   - Open browser and navigate to: `http://YOUR_LOCAL_IP:8080`
+   - Example: `http://192.168.1.100:8080`
+
+### PWA Installation
+
+1. **On Android (Chrome)**
+   - Visit the deployed site
+   - Tap the menu (⋮) > "Add to Home screen"
+   - Follow the prompts
+
+2. **On iOS (Safari)**
+   - Visit the deployed site
+   - Tap the share button (□↑)
+   - Select "Add to Home Screen"
+   - Follow the prompts
+
+3. **On Desktop (Chrome)**
+   - Visit the deployed site
+   - Look for the install icon in the address bar
+   - Click to install
+
+### Mobile Features
+
+- **Touch-friendly interface** with proper button sizes
+- **Responsive navigation** with mobile menu
+- **Offline support** for viewing cached data
+- **App-like experience** when installed
+- **Orientation support** for portrait and landscape
 
 ## 🗄️ Database Setup
 
@@ -224,27 +322,7 @@ CREATE TRIGGER update_family_debts_updated_at BEFORE UPDATE ON public.family_deb
 2. **Configure OAuth (Optional)**
    - Add your site URL to the allowed redirect URLs
    - For local development: `http://localhost:8080`
-   - For production: `https://yourusername.github.io/your-repo-name`
-
-## 🚀 Deployment to GitHub Pages
-
-1. **Configure package.json**
-   Update the homepage field in `package.json`:
-   ```json
-   {
-     "homepage": "https://yourusername.github.io/your-repo-name"
-   }
-   ```
-
-2. **Build and Deploy**
-   ```bash
-   npm run build
-   npm run deploy
-   ```
-
-3. **Update Supabase URLs**
-   - In your Supabase dashboard, go to Authentication > Settings
-   - Add your GitHub Pages URL to the site URL and redirect URLs
+   - For production: `https://yourusername.github.io/lovablenet-worth`
 
 ## 🛠️ Available Scripts
 
@@ -252,6 +330,7 @@ CREATE TRIGGER update_family_debts_updated_at BEFORE UPDATE ON public.family_deb
 - `npm run build` - Build for production
 - `npm run preview` - Preview production build
 - `npm run deploy` - Deploy to GitHub Pages
+- `npm run lint` - Run ESLint
 
 ## 📱 PWA Features
 
@@ -261,11 +340,8 @@ This app is a Progressive Web App with:
 - **Install Prompt**: Can be installed on desktop and mobile
 - **App-like Experience**: Full-screen, native feel
 - **Background Sync**: Data syncs when connection is restored
-
-To install the app:
-1. Visit the deployed site in Chrome/Safari
-2. Look for the "Install" button in the address bar
-3. Click to install to your home screen
+- **Push Notifications**: (Future enhancement)
+- **Service Worker**: Caches resources for offline use
 
 ## 🏗️ Architecture
 
@@ -276,6 +352,7 @@ To install the app:
 - **Database**: Supabase PostgreSQL
 - **Authentication**: Supabase Auth
 - **PWA**: Vite PWA plugin
+- **Mobile**: Responsive design with touch optimization
 
 ## 📋 Data Models
 
@@ -313,6 +390,30 @@ Monitor loans and liabilities:
 Customize colors and design in:
 - `src/index.css` - CSS variables for colors and gradients
 - `tailwind.config.ts` - Tailwind theme extensions
+
+## 🚨 Troubleshooting
+
+### Common Issues
+
+1. **Build fails on GitHub Pages**
+   - Check that all dependencies are in `package.json`
+   - Ensure TypeScript compilation passes locally
+   - Check GitHub Actions logs for specific errors
+
+2. **Authentication not working on production**
+   - Verify Supabase redirect URLs are correct
+   - Check that environment variables are set
+   - Ensure HTTPS is enabled
+
+3. **Mobile app not installing**
+   - Verify PWA manifest is valid
+   - Check that service worker is registered
+   - Ensure HTTPS is enabled (required for PWA)
+
+4. **Local mobile access not working**
+   - Check firewall settings
+   - Ensure devices are on same network
+   - Try using `0.0.0.0` instead of `::` in vite config
 
 ## 🤝 Contributing
 

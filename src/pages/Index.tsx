@@ -3,10 +3,10 @@ import { Link, Navigate } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { useAuth } from '@/contexts/AuthContext'
-import { 
-  PiggyBank, 
-  TrendingUp, 
-  Shield, 
+import {
+  PiggyBank,
+  TrendingUp,
+  Shield,
   Smartphone,
   ArrowRight,
   CheckCircle
@@ -54,7 +54,7 @@ const Index = () => {
             <span className="text-primary block">Journey</span>
           </h1>
           <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-            A comprehensive personal finance PWA to track assets, debts, and family finances. 
+            A comprehensive personal finance PWA to track assets, debts, and family finances.
             Secure, offline-capable, and always in your pocket.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -107,7 +107,7 @@ const Index = () => {
 
           <Card className="shadow-card">
             <CardHeader>
-              <div className="inline-flex items-center justify-center w-12 h-12 bg-gradient-accent rounded-xl mb-4">
+              <div className="inline-flex items-center justify-center w-12 h-12 bg-gradient-success rounded-xl mb-4">
                 <Smartphone className="h-6 w-6 text-white" />
               </div>
               <CardTitle>PWA Ready</CardTitle>
@@ -149,7 +149,7 @@ const Index = () => {
               </div>
             </div>
           </div>
-          <div className="bg-gradient-accent rounded-2xl p-8 text-white">
+          <div className="bg-gradient-primary rounded-2xl p-8 text-white">
             <h3 className="text-2xl font-bold mb-4">Ready to get started?</h3>
             <p className="text-white/90 mb-6">
               Join thousands of users tracking their financial journey with our secure platform.
