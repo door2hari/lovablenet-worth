@@ -28,12 +28,14 @@ const Header: React.FC<HeaderProps> = ({
       const { error } = await signOut()
       if (error) {
         console.error('Error signing out:', error)
-      } else {
-        // Redirect to login page after successful logout
-        navigate('/login')
       }
+      // Always redirect to login page, even if there was an error
+      // The AuthContext now handles clearing the user state properly
+      navigate('/login')
     } catch (error) {
       console.error('Error signing out:', error)
+      // Still redirect to login page even if there's an error
+      navigate('/login')
     }
   }
 

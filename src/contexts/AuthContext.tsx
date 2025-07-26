@@ -63,8 +63,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }
 
   const signOut = async () => {
-    const { error } = await supabase.auth.signOut()
-    return { error }
+    try {
+      const { error } = await supabase.auth.signOut()
+      
+      // Always clear the user state, even if there's an error
+      // This handles cases where the session is already expired
+      setUser(null)
+      
+      return { error }
+    } catch (error) {
+      // If there's an error (like AuthSessionMissingError), 
+      // still clear the user state and treat it as successful logout
+      setUser(null)
+      return { error: null } // Return no error since we successfully cleared the state
+    }
   }
 
   const signInWithGoogle = async () => {
