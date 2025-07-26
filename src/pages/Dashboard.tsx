@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -40,6 +41,7 @@ import { format } from 'date-fns'
 const Dashboard = () => {
   const [isAssetFormOpen, setIsAssetFormOpen] = useState(false)
   const [isDebtFormOpen, setIsDebtFormOpen] = useState(false)
+  const navigate = useNavigate()
 
 
   const { data: assets = [], isLoading: assetsLoading } = useAssets()
@@ -316,7 +318,7 @@ const Dashboard = () => {
               <Button 
                 variant="outline" 
                 className="h-20 flex-col gap-2 button-glow"
-                onClick={() => window.location.href = '/assets'}
+                onClick={() => navigate('/assets')}
               >
                 <BarChart3 className="h-6 w-6" />
                 <span className="text-sm">View Assets</span>
@@ -324,7 +326,7 @@ const Dashboard = () => {
               <Button 
                 variant="outline" 
                 className="h-20 flex-col gap-2 button-glow"
-                onClick={() => window.location.href = '/debts'}
+                onClick={() => navigate('/debts')}
               >
                 <TrendingDown className="h-6 w-6" />
                 <span className="text-sm">View Debts</span>
@@ -332,7 +334,7 @@ const Dashboard = () => {
               <Button 
                 variant="outline" 
                 className="h-20 flex-col gap-2 button-glow"
-                onClick={() => window.location.href = '/family'}
+                onClick={() => navigate('/family')}
               >
                 <Users className="h-6 w-6" />
                 <span className="text-sm">Family</span>

@@ -346,7 +346,8 @@ const Family = () => {
     <div className="min-h-screen bg-background">
       <Header 
         title="Family Members"
-        showAddButtons={false}
+        showAddButtons={true}
+        onAddMember={() => setIsFormOpen(true)}
       />
 
       <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8 py-4 sm:py-8 space-y-4 sm:space-y-8">

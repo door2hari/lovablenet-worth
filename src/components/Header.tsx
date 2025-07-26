@@ -9,13 +9,15 @@ interface HeaderProps {
   showAddButtons?: boolean
   onAddAsset?: () => void
   onAddDebt?: () => void
+  onAddMember?: () => void
 }
 
 const Header: React.FC<HeaderProps> = ({ 
   title, 
   showAddButtons = false, 
   onAddAsset, 
-  onAddDebt 
+  onAddDebt,
+  onAddMember
 }) => {
   const { user, signOut } = useAuth()
 
@@ -55,7 +57,7 @@ const Header: React.FC<HeaderProps> = ({
           </div>
 
           {/* Right side - User info and actions */}
-          <div className="flex items-center space-x-1 sm:space-x-2 flex-shrink-0">
+          <div className="flex items-center space-x-1 sm:space-x-2 flex-shrink-0 pl-2">
             {/* Add buttons (only show on dashboard) */}
             {showAddButtons && onAddAsset && onAddDebt && (
               <>
@@ -75,6 +77,17 @@ const Header: React.FC<HeaderProps> = ({
                   <span className="sm:hidden">Debt</span>
                 </Button>
               </>
+            )}
+
+            {/* Add member button (for family page) */}
+            {showAddButtons && onAddMember && (
+              <Button 
+                onClick={onAddMember} 
+                className="button-glow text-xs sm:text-sm px-2 sm:px-3 h-8 sm:h-9"
+              >
+                <span className="hidden sm:inline pr-1">Add Member</span>
+                <span className="sm:hidden">Member</span>
+              </Button>
             )}
 
             {/* User info */}
