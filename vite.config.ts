@@ -6,7 +6,7 @@ import { VitePWA } from 'vite-plugin-pwa';
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
-  base: process.env.NODE_ENV === 'production' ? '/lovablenet-worth/' : '/',
+  base: '/lovablenet-worth/',
   server: {
     host: "::",
     port: 8080,
@@ -41,8 +41,8 @@ export default defineConfig(({ mode }) => ({
         theme_color: '#1d4ed8',
         background_color: '#f8fafc',
         display: 'standalone',
-        start_url: '/',
-        scope: '/',
+        start_url: '/lovablenet-worth/',
+        scope: '/lovablenet-worth/',
         icons: [
           {
             src: 'pwa-192x192.png',
