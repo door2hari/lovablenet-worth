@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useEffect } from 'react'
 import { User } from '@supabase/supabase-js'
-import { supabase } from '@/lib/supabase'
+import { supabase, isSupabaseConfigured } from '@/lib/supabase'
 import { useAuthStore } from '@/store/auth'
 
 interface AuthContextType {
@@ -26,6 +26,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const { user, loading, setUser, setLoading } = useAuthStore()
 
   useEffect(() => {
+    // If Supabase is not configured, set loading to false and user to null
+    if (!isSupabaseConfigured) {
+      setUser(null)
+      setLoading(false)
+      return
+    }
+
     // Get initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null)

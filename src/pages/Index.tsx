@@ -2,6 +2,8 @@ import React from 'react'
 import { Link } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import SetupGuide from '@/components/SetupGuide'
+import { isSupabaseConfigured } from '@/lib/supabase'
 import { 
   PiggyBank, 
   TrendingUp, 
@@ -12,6 +14,10 @@ import {
 } from 'lucide-react'
 
 const Index = () => {
+  // Show setup guide if Supabase is not configured
+  if (!isSupabaseConfigured) {
+    return <SetupGuide />
+  }
   return (
     <div className="min-h-screen bg-gradient-to-br from-background to-secondary">
       {/* Header */}
