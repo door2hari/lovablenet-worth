@@ -14,7 +14,244 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      assets: {
+        Row: {
+          created_at: string | null
+          currency: string | null
+          id: string
+          metadata: Json | null
+          name: string
+          subtype: string | null
+          type: string
+          updated_at: string | null
+          user_id: string
+          value: number
+        }
+        Insert: {
+          created_at?: string | null
+          currency?: string | null
+          id?: string
+          metadata?: Json | null
+          name: string
+          subtype?: string | null
+          type: string
+          updated_at?: string | null
+          user_id: string
+          value: number
+        }
+        Update: {
+          created_at?: string | null
+          currency?: string | null
+          id?: string
+          metadata?: Json | null
+          name?: string
+          subtype?: string | null
+          type?: string
+          updated_at?: string | null
+          user_id?: string
+          value?: number
+        }
+        Relationships: []
+      }
+      debts: {
+        Row: {
+          balance: number
+          created_at: string | null
+          currency: string | null
+          id: string
+          interest_rate: number | null
+          lender: string
+          metadata: Json | null
+          principal: number
+          term_years: number | null
+          type: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          balance: number
+          created_at?: string | null
+          currency?: string | null
+          id?: string
+          interest_rate?: number | null
+          lender: string
+          metadata?: Json | null
+          principal: number
+          term_years?: number | null
+          type: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          balance?: number
+          created_at?: string | null
+          currency?: string | null
+          id?: string
+          interest_rate?: number | null
+          lender?: string
+          metadata?: Json | null
+          principal?: number
+          term_years?: number | null
+          type?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      family_assets: {
+        Row: {
+          created_at: string | null
+          currency: string | null
+          family_member_id: string
+          id: string
+          metadata: Json | null
+          name: string
+          subtype: string | null
+          type: string
+          updated_at: string | null
+          user_id: string
+          value: number
+        }
+        Insert: {
+          created_at?: string | null
+          currency?: string | null
+          family_member_id: string
+          id?: string
+          metadata?: Json | null
+          name: string
+          subtype?: string | null
+          type: string
+          updated_at?: string | null
+          user_id: string
+          value: number
+        }
+        Update: {
+          created_at?: string | null
+          currency?: string | null
+          family_member_id?: string
+          id?: string
+          metadata?: Json | null
+          name?: string
+          subtype?: string | null
+          type?: string
+          updated_at?: string | null
+          user_id?: string
+          value?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "family_assets_family_member_id_fkey"
+            columns: ["family_member_id"]
+            isOneToOne: false
+            referencedRelation: "family_members"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      family_debts: {
+        Row: {
+          balance: number
+          created_at: string | null
+          currency: string | null
+          family_member_id: string
+          id: string
+          interest_rate: number | null
+          lender: string
+          metadata: Json | null
+          principal: number
+          term_years: number | null
+          type: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          balance: number
+          created_at?: string | null
+          currency?: string | null
+          family_member_id: string
+          id?: string
+          interest_rate?: number | null
+          lender: string
+          metadata?: Json | null
+          principal: number
+          term_years?: number | null
+          type: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          balance?: number
+          created_at?: string | null
+          currency?: string | null
+          family_member_id?: string
+          id?: string
+          interest_rate?: number | null
+          lender?: string
+          metadata?: Json | null
+          principal?: number
+          term_years?: number | null
+          type?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "family_debts_family_member_id_fkey"
+            columns: ["family_member_id"]
+            isOneToOne: false
+            referencedRelation: "family_members"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      family_members: {
+        Row: {
+          avatar_url: string | null
+          created_at: string | null
+          id: string
+          name: string
+          relation: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string | null
+          id?: string
+          name: string
+          relation: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string | null
+          id?: string
+          name?: string
+          relation?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      users: {
+        Row: {
+          created_at: string | null
+          email: string
+          id: string
+        }
+        Insert: {
+          created_at?: string | null
+          email: string
+          id: string
+        }
+        Update: {
+          created_at?: string | null
+          email?: string
+          id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
