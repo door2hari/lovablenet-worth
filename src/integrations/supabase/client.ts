@@ -12,7 +12,6 @@ console.log('Supabase Key:', SUPABASE_PUBLISHABLE_KEY ? '***' : 'undefined');
 
 // Import the supabase client like this:
 // import { supabase } from "@/integrations/supabase/client";
-console.log(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
 
 export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
   auth: {
