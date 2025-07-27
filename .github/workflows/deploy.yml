@@ -17,6 +17,7 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
+    environment: github-pages
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -32,15 +33,15 @@ jobs:
         
       - name: Debug environment variables
         run: |
-          echo "Checking if secrets are available..."
-          if [ -n "${{ secrets.VITE_SUPABASE_URL }}" ]; then
+          echo "Checking if environment variables are available..."
+          if [ -n "${{ vars.VITE_SUPABASE_URL }}" ]; then
             echo "✅ VITE_SUPABASE_URL is set"
-            echo "URL: ${{ secrets.VITE_SUPABASE_URL }}"
+            echo "URL: ${{ vars.VITE_SUPABASE_URL }}"
           else
             echo "❌ VITE_SUPABASE_URL is not set"
           fi
           
-          if [ -n "${{ secrets.VITE_SUPABASE_ANON_KEY }}" ]; then
+          if [ -n "${{ vars.VITE_SUPABASE_ANON_KEY }}" ]; then
             echo "✅ VITE_SUPABASE_ANON_KEY is set"
             echo "Key: ***"
           else
@@ -50,8 +51,8 @@ jobs:
       - name: Build with environment variables
         run: npm run build
         env:
-          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
-          VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
+          VITE_SUPABASE_URL: ${{ vars.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ vars.VITE_SUPABASE_ANON_KEY }}
           
       - name: Setup Pages
         uses: actions/configure-pages@v4
