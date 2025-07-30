@@ -10,6 +10,7 @@ import { useFamilyMembers, useDeleteFamilyMember, useAllFamilyAssets, useDeleteF
 import { FamilyMemberForm } from '@/components/FamilyMemberForm'
 import { FamilyAssetForm } from '@/components/FamilyAssetForm'
 import { FamilyDebtForm } from '@/components/FamilyDebtForm'
+import LastModifiedInfo from '@/components/LastModifiedInfo'
 import { FamilyMember, FamilyAsset, FamilyDebt } from '@/types'
 import { Plus, Edit, Trash2, Users, UserPlus, DollarSign, TrendingUp, TrendingDown, PieChart, BarChart3, Target, Activity, PiggyBank, Home, Car, CreditCard, Building2 } from 'lucide-react'
 import { useToast } from '@/hooks/use-toast'
@@ -25,6 +26,20 @@ const Family = () => {
   const deleteFamilyAsset = useDeleteFamilyAsset()
   const deleteFamilyDebt = useDeleteFamilyDebt()
   const { toast } = useToast()
+
+  // Calculate last modified timestamp
+  const getLastModified = () => {
+    const allItems = [...members, ...(allFamilyAssets.data || []), ...(allFamilyDebts.data || [])]
+    if (allItems.length === 0) return new Date()
+    
+    const latestItem = allItems.reduce((latest, item) => {
+      const itemDate = new Date(item.updated_at || item.created_at)
+      const latestDate = new Date(latest.updated_at || latest.created_at)
+      return itemDate > latestDate ? item : latest
+    })
+    
+    return new Date(latestItem.updated_at || latestItem.created_at)
+  }
 
   // Helper functions - defined first to avoid initialization errors
   const getRelationLabel = (relation: string) => {
@@ -203,6 +218,18 @@ const Family = () => {
   const renderAssetsTable = (memberId: string) => {
     const assets = allFamilyAssets.data?.filter(asset => asset.family_member_id === memberId) || []
     const loadingAssets = allFamilyAssets.isLoading
+    
+    // Calculate last modified for this member's assets
+    const getMemberAssetsLastModified = () => {
+      if (assets.length === 0) return new Date()
+      const latestAsset = assets.reduce((latest, asset) => {
+        const assetDate = new Date(asset.updated_at || asset.created_at)
+        const latestDate = new Date(latest.updated_at || latest.created_at)
+        return assetDate > latestDate ? asset : latest
+      })
+      return new Date(latestAsset.updated_at || latestAsset.created_at)
+    }
+    
     return (
       <div className="mb-4">
         <div className="flex justify-between items-center mb-2">
@@ -211,6 +238,16 @@ const Family = () => {
             <Plus className="h-4 w-4 mr-1" /> Add Asset
           </Button>
         </div>
+        {assets.length > 0 && (
+          <div className="flex justify-end mb-2">
+            <LastModifiedInfo
+              lastModified={getMemberAssetsLastModified()}
+              recordCount={assets.length}
+              recordType="assets"
+              className="text-xs"
+            />
+          </div>
+        )}
         {loadingAssets ? (
           <div className="text-muted-foreground text-sm">Loading assets...</div>
         ) : assets.length === 0 ? (
@@ -263,6 +300,18 @@ const Family = () => {
   const renderDebtsTable = (memberId: string) => {
     const debts = allFamilyDebts.data?.filter(debt => debt.family_member_id === memberId) || []
     const loadingDebts = allFamilyDebts.isLoading
+    
+    // Calculate last modified for this member's debts
+    const getMemberDebtsLastModified = () => {
+      if (debts.length === 0) return new Date()
+      const latestDebt = debts.reduce((latest, debt) => {
+        const debtDate = new Date(debt.updated_at || debt.created_at)
+        const latestDate = new Date(latest.updated_at || latest.created_at)
+        return debtDate > latestDate ? debt : latest
+      })
+      return new Date(latestDebt.updated_at || latestDebt.created_at)
+    }
+    
     return (
       <div className="mb-4">
         <div className="flex justify-between items-center mb-2">
@@ -271,6 +320,16 @@ const Family = () => {
             <Plus className="h-4 w-4 mr-1" /> Add Debt
           </Button>
         </div>
+        {debts.length > 0 && (
+          <div className="flex justify-end mb-2">
+            <LastModifiedInfo
+              lastModified={getMemberDebtsLastModified()}
+              recordCount={debts.length}
+              recordType="debts"
+              className="text-xs"
+            />
+          </div>
+        )}
         {loadingDebts ? (
           <div className="text-muted-foreground text-sm">Loading debts...</div>
         ) : debts.length === 0 ? (
@@ -351,6 +410,15 @@ const Family = () => {
       />
 
       <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8 py-4 sm:py-8 space-y-4 sm:space-y-8">
+        {/* Last Modified Info */}
+        <div className="flex justify-end">
+          <LastModifiedInfo
+            lastModified={getLastModified()}
+            recordCount={members.length + (allFamilyAssets.data?.length || 0) + (allFamilyDebts.data?.length || 0)}
+            recordType="family records"
+          />
+        </div>
+        
         {/* Family Financial Overview Cards */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
           <Card className="bg-gradient-to-r from-green-500 to-green-600 text-white shadow-finance">

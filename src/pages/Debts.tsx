@@ -7,6 +7,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import Header from '@/components/Header'
 import { useDebts, useDeleteDebt } from '@/hooks/useSupabaseData'
 import { DebtForm } from '@/components/DebtForm'
+import LastModifiedInfo from '@/components/LastModifiedInfo'
 import { Debt } from '@/types'
 import { Plus, Edit, Trash2, TrendingDown, DollarSign, CreditCard } from 'lucide-react'
 import { useToast } from '@/hooks/use-toast'
@@ -17,6 +18,19 @@ const Debts = () => {
   const { data: debts = [], isLoading, error } = useDebts()
   const deleteDebt = useDeleteDebt()
   const { toast } = useToast()
+
+  // Calculate last modified timestamp
+  const getLastModified = () => {
+    if (debts.length === 0) return new Date()
+    
+    const latestDebt = debts.reduce((latest, debt) => {
+      const debtDate = new Date(debt.updated_at || debt.created_at)
+      const latestDate = new Date(latest.updated_at || latest.created_at)
+      return debtDate > latestDate ? debt : latest
+    })
+    
+    return new Date(latestDebt.updated_at || latestDebt.created_at)
+  }
 
   const handleEdit = (debt: Debt) => {
     setEditingDebt(debt)
@@ -94,6 +108,15 @@ const Debts = () => {
       />
 
       <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8 py-4 sm:py-8">
+        {/* Last Modified Info */}
+        <div className="flex justify-end mb-4">
+          <LastModifiedInfo
+            lastModified={getLastModified()}
+            recordCount={debts.length}
+            recordType="debts"
+          />
+        </div>
+        
         {/* Summary Cards */}
         <div className="grid grid-cols-2 gap-3 sm:gap-6 mb-4 sm:mb-8">
           <Card className="bg-gradient-to-r from-red-500 to-red-600 text-white shadow-finance">
@@ -143,6 +166,14 @@ const Debts = () => {
               </div>
             ) : (
               <div className="overflow-x-auto">
+                <div className="flex justify-end mb-4">
+                  <LastModifiedInfo
+                    lastModified={getLastModified()}
+                    recordCount={debts.length}
+                    recordType="debts"
+                    className="text-xs"
+                  />
+                </div>
                 <Table>
                   <TableHeader>
                     <TableRow>

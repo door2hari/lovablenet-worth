@@ -17,6 +17,7 @@ import {
 import { useAssets, useDebts, useFamilyMembers, useFinancialSummary } from '@/hooks/useSupabaseData'
 import { AssetForm } from '@/components/AssetForm'
 import { DebtForm } from '@/components/DebtForm'
+import LastModifiedInfo from '@/components/LastModifiedInfo'
 
 import { 
   TrendingUp, 
@@ -50,6 +51,20 @@ const Dashboard = () => {
   const familyMembers = familyMembersResult.data || []
   const financialSummary = useFinancialSummary()
   const { toast } = useToast()
+
+  // Calculate last modified timestamp
+  const getLastModified = () => {
+    const allItems = [...assets, ...debts, ...familyMembers]
+    if (allItems.length === 0) return new Date()
+    
+    const latestItem = allItems.reduce((latest, item) => {
+      const itemDate = new Date(item.updated_at || item.created_at)
+      const latestDate = new Date(latest.updated_at || latest.created_at)
+      return itemDate > latestDate ? item : latest
+    })
+    
+    return new Date(latestItem.updated_at || latestItem.created_at)
+  }
 
   const { totalAssets, totalDebts, netWorth, assetBreakdown, debtBreakdown } = financialSummary || {}
 
@@ -141,7 +156,14 @@ const Dashboard = () => {
       />
 
       <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8 py-4 sm:py-8 space-y-4 sm:space-y-8">
-
+        {/* Last Modified Info */}
+        <div className="flex justify-end">
+          <LastModifiedInfo
+            lastModified={getLastModified()}
+            recordCount={assets.length + debts.length + familyMembers.length}
+            recordType="total records"
+          />
+        </div>
 
         {/* Summary Cards */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">

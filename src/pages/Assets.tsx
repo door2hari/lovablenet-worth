@@ -10,6 +10,7 @@ import Header from '@/components/Header'
 import { PieChartComponent, BarChartComponent, DonutChartComponent } from '@/components/ui/charts'
 import { useAssets, useDeleteAsset } from '@/hooks/useSupabaseData'
 import { AssetForm } from '@/components/AssetForm'
+import LastModifiedInfo from '@/components/LastModifiedInfo'
 
 import { Asset } from '@/types'
 import { Plus, Edit, Trash2, PiggyBank, BarChart3, PieChart, Download, TrendingUp, Target, Activity } from 'lucide-react'
@@ -24,6 +25,19 @@ const Assets = () => {
   const { data: assets = [], isLoading, error } = useAssets()
   const deleteAsset = useDeleteAsset()
   const { toast } = useToast()
+
+  // Calculate last modified timestamp
+  const getLastModified = () => {
+    if (assets.length === 0) return new Date()
+    
+    const latestAsset = assets.reduce((latest, asset) => {
+      const assetDate = new Date(asset.updated_at || asset.created_at)
+      const latestDate = new Date(latest.updated_at || latest.created_at)
+      return assetDate > latestDate ? asset : latest
+    })
+    
+    return new Date(latestAsset.updated_at || latestAsset.created_at)
+  }
 
   // Use all assets without filtering
   const filteredAssets = assets
@@ -137,7 +151,14 @@ const Assets = () => {
       />
 
       <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8 py-4 sm:py-8 space-y-4 sm:space-y-8">
-
+        {/* Last Modified Info */}
+        <div className="flex justify-end">
+          <LastModifiedInfo
+            lastModified={getLastModified()}
+            recordCount={assets.length}
+            recordType="assets"
+          />
+        </div>
 
         {/* Summary Cards */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
@@ -236,7 +257,15 @@ const Assets = () => {
                   </div>
                 ) : (
                   <div className="overflow-x-auto">
-                                          <Table className="min-w-full">
+                    <div className="flex justify-end mb-4">
+                      <LastModifiedInfo
+                        lastModified={getLastModified()}
+                        recordCount={filteredAssets.length}
+                        recordType="assets"
+                        className="text-xs"
+                      />
+                    </div>
+                    <Table className="min-w-full">
                       <TableHeader>
                         <TableRow>
                           <TableHead>Name</TableHead>
